@@ -4,7 +4,7 @@ from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.compute.lib import base_classes
 from googlecloudsdk.compute.lib import constants
 from googlecloudsdk.compute.lib import image_utils
-from googlecloudsdk.compute.lib import master_key_utils
+from googlecloudsdk.compute.lib import main_key_utils
 from googlecloudsdk.compute.lib import utils
 from googlecloudsdk.compute.lib import zone_utils
 
@@ -42,7 +42,7 @@ class Create(base_classes.BaseAsyncCreator, image_utils.ImageExpander,
 
     source_group = parser.add_mutually_exclusive_group()
 
-    master_key_utils.AddMasterKeyArgs(parser)
+    main_key_utils.AddMainKeyArgs(parser)
 
     def AddImageHelp():
       return """\
@@ -138,11 +138,11 @@ class Create(base_classes.BaseAsyncCreator, image_utils.ImageExpander,
     else:
       snapshot_uri = None
 
-    master_keys = master_key_utils.MasterKeyStore.FromArgs(args)
+    main_keys = main_key_utils.MainKeyStore.FromArgs(args)
 
     image_key_or_none, snapshot_key_or_none = (
-        master_key_utils.MaybeLookupKeysByUri(
-            master_keys, self.resources, [source_image_uri, snapshot_uri]))
+        main_key_utils.MaybeLookupKeysByUri(
+            main_keys, self.resources, [source_image_uri, snapshot_uri]))
 
     for disk_ref in disk_refs:
       if args.type:
@@ -153,12 +153,12 @@ class Create(base_classes.BaseAsyncCreator, image_utils.ImageExpander,
       else:
         type_uri = None
 
-      if master_keys:
-        disk_key_or_none = master_keys.LookupKey(
-            disk_ref, not args.no_require_master_key_create)
-        kwargs = {'diskMasterKey': disk_key_or_none,
-                  'sourceImageMasterKey': image_key_or_none,
-                  'sourceSnapshotMasterKey': snapshot_key_or_none}
+      if main_keys:
+        disk_key_or_none = main_keys.LookupKey(
+            disk_ref, not args.no_require_main_key_create)
+        kwargs = {'diskMainKey': disk_key_or_none,
+                  'sourceImageMainKey': image_key_or_none,
+                  'sourceSnapshotMainKey': snapshot_key_or_none}
       else:
         kwargs = {}
 

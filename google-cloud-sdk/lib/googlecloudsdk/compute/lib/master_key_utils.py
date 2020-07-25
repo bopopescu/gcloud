@@ -1,5 +1,5 @@
 # Copyright 2014 Google Inc. All Rights Reserved.
-"""Utility functions for managing customer supplied master keys."""
+"""Utility functions for managing customer supplied main keys."""
 
 import argparse
 import base64
@@ -15,10 +15,10 @@ BASE64_KEY_LENGTH_IN_CHARS = 44
 SUPPRESS_MASTER_KEY_UTILS = True
 
 
-class MissingMasterKeyException(exceptions.ToolException):
+class MissingMainKeyException(exceptions.ToolException):
 
   def __init__(self, resource):
-    super(MissingMasterKeyException, self).__init__(
+    super(MissingMainKeyException, self).__init__(
         'Key required for resource [{}], but none found.'.format(resource))
 
 
@@ -63,32 +63,32 @@ def ValidateKey(base64_encoded_string):
             len(base64_encoded_string)))
 
 
-def AddMasterKeyArgs(parser, flags_about_creation=True):
-  """Adds arguments related to master keys."""
+def AddMainKeyArgs(parser, flags_about_creation=True):
+  """Adds arguments related to main keys."""
 
-  master_key_file = parser.add_argument(
-      '--master-key-file',
+  main_key_file = parser.add_argument(
+      '--main-key-file',
       help=(argparse.SUPPRESS if SUPPRESS_MASTER_KEY_UTILS
-            else 'Path to a master key file'),
+            else 'Path to a main key file'),
       metavar='FILE')
-  master_key_file.detailed_help = (
-      'Path to a master key file, mapping GCE resources to user managed '
+  main_key_file.detailed_help = (
+      'Path to a main key file, mapping GCE resources to user managed '
       'keys to be used when creating, mounting, or snapshotting disks. ')
   # TODO(user)
   # Argument - indicates the key file should be read from stdin.'
 
   if flags_about_creation:
-    no_require_master_key_create = parser.add_argument(
-        '--no-require-master-key-create',
+    no_require_main_key_create = parser.add_argument(
+        '--no-require-main-key-create',
         help=(argparse.SUPPRESS if SUPPRESS_MASTER_KEY_UTILS
-              else 'Allow creating of resources not protected by master key.'),
+              else 'Allow creating of resources not protected by main key.'),
         action='store_true')
-    no_require_master_key_create.detailed_help = (
-        'When invoked with --master-key-file gcloud will refuse to create '
+    no_require_main_key_create.detailed_help = (
+        'When invoked with --main-key-file gcloud will refuse to create '
         'resources not protected by a user managed key in the key file.  This '
         'is intended to prevent incorrect gcloud invocations from accidentally '
         'creating resources with no user managed key.  This flag disables the '
-        'check and allows creation of resources without master keys.')
+        'check and allows creation of resources without main keys.')
 
 
 class UriPattern(object):
@@ -107,7 +107,7 @@ class UriPattern(object):
     return 'Uri Pattern: ' + self._path_as_string
 
 
-class MasterKeyStore(object):
+class MainKeyStore(object):
   """Represents a map from resource patterns to keys."""
 
   # Members
@@ -115,7 +115,7 @@ class MasterKeyStore(object):
 
   @staticmethod
   def FromFile(fname):
-    """FromFile loads a MasterKeyStore from a file.
+    """FromFile loads a MainKeyStore from a file.
 
     Args:
       fname: str, the name of a file intended to contain a well-formed key file
@@ -132,34 +132,34 @@ class MasterKeyStore(object):
     with open(fname) as infile:
       content = infile.read()
 
-    return MasterKeyStore(content)
+    return MainKeyStore(content)
 
   @staticmethod
   def FromArgs(args):
-    """FromFile attempts to load a MasterKeyStore from a command's args.
+    """FromFile attempts to load a MainKeyStore from a command's args.
 
     Args:
-      args: CLI args with a master_key_file field set
+      args: CLI args with a main_key_file field set
 
     Returns:
-      A MasterKeyStore, if a valid key file name is provided as master_key_file
-      None, if args.master_key_file is None
+      A MainKeyStore, if a valid key file name is provided as main_key_file
+      None, if args.main_key_file is None
 
     Raises:
       exceptions.BadFileException: there's a problem reading fname
       exceptions.InvalidKeyFileException: the key file failed to parse
         or was otherwise invalid
     """
-    assert hasattr(args, 'master_key_file')
+    assert hasattr(args, 'main_key_file')
 
-    if args.master_key_file is None:
+    if args.main_key_file is None:
       return None
 
-    return MasterKeyStore.FromFile(args.master_key_file)
+    return MainKeyStore.FromFile(args.main_key_file)
 
   @staticmethod
   def _ParseAndValidate(s):
-    """_ParseAndValidate(s) inteprets s as a master key file.
+    """_ParseAndValidate(s) inteprets s as a main key file.
 
     Args:
       s: str, an input to parse
@@ -220,7 +220,7 @@ class MasterKeyStore(object):
 
     Raises:
       InvalidKeyFileException: if there are two records matching the resource.
-      MissingMasterKeyException: if raise_if_missing and no key is found
+      MissingMainKeyException: if raise_if_missing and no key is found
         for the provided resoure.
     """
 
@@ -240,26 +240,26 @@ class MasterKeyStore(object):
         search_state = (pat, key)
 
     if raise_if_missing and (search_state[1] is None):
-      raise MissingMasterKeyException(resource)
+      raise MissingMainKeyException(resource)
 
     return search_state[1]
 
   def __init__(self, json_string):
-    self.state = MasterKeyStore._ParseAndValidate(json_string)
+    self.state = MainKeyStore._ParseAndValidate(json_string)
 
 
-def MaybeLookupKey(master_keys_or_none, resource):
-  if master_keys_or_none and resource:
-    return master_keys_or_none.LookupKey(resource)
+def MaybeLookupKey(main_keys_or_none, resource):
+  if main_keys_or_none and resource:
+    return main_keys_or_none.LookupKey(resource)
 
   return None
 
 
-def MaybeLookupKeys(master_keys_or_none, resources):
-  return [MaybeLookupKey(master_keys_or_none, r) for r in resources]
+def MaybeLookupKeys(main_keys_or_none, resources):
+  return [MaybeLookupKey(main_keys_or_none, r) for r in resources]
 
 
-def MaybeLookupKeysByUri(master_keys_or_none, parser, uris):
+def MaybeLookupKeysByUri(main_keys_or_none, parser, uris):
   return MaybeLookupKeys(
-      master_keys_or_none,
+      main_keys_or_none,
       [(parser.Parse(u) if u else None) for u in uris])

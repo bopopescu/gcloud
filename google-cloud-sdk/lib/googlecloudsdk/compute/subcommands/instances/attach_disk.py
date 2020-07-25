@@ -1,7 +1,7 @@
 # Copyright 2014 Google Inc. All Rights Reserved.
 """Command for attaching a disk to an instance."""
 from googlecloudsdk.compute.lib import base_classes
-from googlecloudsdk.compute.lib import master_key_utils
+from googlecloudsdk.compute.lib import main_key_utils
 from googlecloudsdk.compute.lib import utils
 
 MODE_OPTIONS = ['ro', 'rw']
@@ -44,7 +44,7 @@ class AttachDisk(base_classes.NoOutputAsyncMutator):
         resource_type='instance',
         operation_type='attach a disk to')
 
-    master_key_utils.AddMasterKeyArgs(parser, flags_about_creation=False)
+    main_key_utils.AddMainKeyArgs(parser, flags_about_creation=False)
 
   @property
   def service(self):
@@ -69,11 +69,11 @@ class AttachDisk(base_classes.NoOutputAsyncMutator):
     else:
       mode = self.messages.AttachedDisk.ModeValueValuesEnum.READ_ONLY
 
-    master_keys = master_key_utils.MasterKeyStore.FromArgs(args)
+    main_keys = main_key_utils.MainKeyStore.FromArgs(args)
 
-    if master_keys:
-      disk_key_or_none = master_keys.LookupKey(disk_ref)
-      kwargs = {'diskMasterKey': disk_key_or_none}
+    if main_keys:
+      disk_key_or_none = main_keys.LookupKey(disk_ref)
+      kwargs = {'diskMainKey': disk_key_or_none}
     else:
       kwargs = {}
 

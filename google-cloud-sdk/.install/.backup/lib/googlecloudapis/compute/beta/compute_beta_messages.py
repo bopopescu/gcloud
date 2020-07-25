@@ -283,10 +283,10 @@ class AttachedDisk(messages.Message):
       disk, in the form persistent-disks-x, where x is a number assigned by
       Google Compute Engine. This field is only applicable for persistent
       disks.
-    diskMasterKey: Master key of the disk; required only if the disk already
-      exists and is master key protected. If the disk is being created and a
-      master key is provided, the newly created disk will be protected with
-      this master key. Format: Random 256-bit key material encoded in base64.
+    diskMainKey: Main key of the disk; required only if the disk already
+      exists and is main key protected. If the disk is being created and a
+      main key is provided, the newly created disk will be protected with
+      this main key. Format: Random 256-bit key material encoded in base64.
     index: Assigns a zero-based index to this disk, where 0 is reserved for
       the boot disk. For example, if you have many disks attached to an
       instance, each disk would have a unique index number. If not specified,
@@ -344,7 +344,7 @@ class AttachedDisk(messages.Message):
   autoDelete = messages.BooleanField(1)
   boot = messages.BooleanField(2)
   deviceName = messages.StringField(3)
-  diskMasterKey = messages.StringField(4)
+  diskMainKey = messages.StringField(4)
   index = messages.IntegerField(5, variant=messages.Variant.INT32)
   initializeParams = messages.MessageField('AttachedDiskInitializeParams', 6)
   interface = messages.EnumField('InterfaceValueValuesEnum', 7)
@@ -393,8 +393,8 @@ class AttachedDiskInitializeParams(messages.Message):
       to include the project in the URL:  projects/debian-
       cloud/global/images/debian-7-wheezy-vYYYYMMDD   where vYYYYMMDD is the
       image version. The fully-qualified URL will also work in both cases.
-    sourceImageMasterKey: Master key of the source image; required only if the
-      source image is master key protected. Format: Random 256-bit key
+    sourceImageMainKey: Main key of the source image; required only if the
+      source image is main key protected. Format: Random 256-bit key
       material encoded in base64.
   """
 
@@ -416,7 +416,7 @@ class AttachedDiskInitializeParams(messages.Message):
   diskStorageType = messages.EnumField('DiskStorageTypeValueValuesEnum', 3)
   diskType = messages.StringField(4)
   sourceImage = messages.StringField(5)
-  sourceImageMasterKey = messages.StringField(6)
+  sourceImageMainKey = messages.StringField(6)
 
 
 class Backend(messages.Message):
@@ -3030,9 +3030,9 @@ class Disk(messages.Message):
       only).
     description: An optional textual description of the resource; provided by
       the client when the resource is created.
-    diskMasterKey: Master key to protect the disk. When attempting to use a
-      master key protected disk, the key must be provided otherwise the
-      request will fail. Master keys do not protect resource metadata. Format:
+    diskMainKey: Main key to protect the disk. When attempting to use a
+      main key protected disk, the key must be provided otherwise the
+      request will fail. Main keys do not protect resource metadata. Format:
       Random 256-bit key material encoded in base64.
     id: Unique identifier for the resource; defined by the server (output
       only).
@@ -3049,15 +3049,15 @@ class Disk(messages.Message):
     sourceImageId: The 'id' value of the image used to create this disk. This
       value may be used to determine whether the disk was created from the
       current or a previous instance of a given image.
-    sourceImageMasterKey: Master key of the source image; required only if the
-      source image is master key protected. Format: Random 256-bit key
+    sourceImageMainKey: Main key of the source image; required only if the
+      source image is main key protected. Format: Random 256-bit key
       material encoded in base64.
     sourceSnapshot: The source snapshot used to create this disk.
     sourceSnapshotId: The 'id' value of the snapshot used to create this disk.
       This value may be used to determine whether the disk was created from
       the current or a previous instance of a given disk snapshot.
-    sourceSnapshotMasterKey: Master key of the source snapshot; required only
-      if the source snapshot is master key protected. Format: Random 256-bit
+    sourceSnapshotMainKey: Main key of the source snapshot; required only
+      if the source snapshot is main key protected. Format: Random 256-bit
       key material encoded in base64.
     status: The status of disk creation (output only).
     storageType: DEPRECATED. Storage type of the persistent disk.
@@ -3092,7 +3092,7 @@ class Disk(messages.Message):
 
   creationTimestamp = messages.StringField(1)
   description = messages.StringField(2)
-  diskMasterKey = messages.StringField(3)
+  diskMainKey = messages.StringField(3)
   id = messages.IntegerField(4, variant=messages.Variant.UINT64)
   kind = messages.StringField(5, default=u'compute#disk')
   licenses = messages.StringField(6, repeated=True)
@@ -3102,10 +3102,10 @@ class Disk(messages.Message):
   sizeGb = messages.IntegerField(10)
   sourceImage = messages.StringField(11)
   sourceImageId = messages.StringField(12)
-  sourceImageMasterKey = messages.StringField(13)
+  sourceImageMainKey = messages.StringField(13)
   sourceSnapshot = messages.StringField(14)
   sourceSnapshotId = messages.StringField(15)
-  sourceSnapshotMasterKey = messages.StringField(16)
+  sourceSnapshotMainKey = messages.StringField(16)
   status = messages.EnumField('StatusValueValuesEnum', 17)
   storageType = messages.EnumField('StorageTypeValueValuesEnum', 18)
   type = messages.StringField(19)
@@ -3963,9 +3963,9 @@ class Image(messages.Message):
     diskSizeGb: Size of the image when restored onto a disk (in GiB).
     id: Unique identifier for the resource; defined by the server (output
       only).
-    imageMasterKey: Master key to protect the image. When attempting to use a
-      master key protected image, the key must be provided otherwise the
-      request will fail. Master keys do not protect resource metadata. Format:
+    imageMainKey: Main key to protect the image. When attempting to use a
+      main key protected image, the key must be provided otherwise the
+      request will fail. Main keys do not protect resource metadata. Format:
       Random 256-bit key material encoded in base64.
     kind: Type of the resource.
     licenses: Public visible licenses.
@@ -3977,8 +3977,8 @@ class Image(messages.Message):
     sourceDiskId: The 'id' value of the disk used to create this image. This
       value may be used to determine whether the image was taken from the
       current or a previous instance of a given disk name.
-    sourceDiskMasterKey: Master key of the source disk; required only if the
-      source disk is master key protected. Format: Random 256-bit key material
+    sourceDiskMainKey: Main key of the source disk; required only if the
+      source disk is main key protected. Format: Random 256-bit key material
       encoded in base64.
     sourceType: Must be "RAW"; provided by the client when the disk image is
       created.
@@ -4055,7 +4055,7 @@ class Image(messages.Message):
   description = messages.StringField(4)
   diskSizeGb = messages.IntegerField(5)
   id = messages.IntegerField(6, variant=messages.Variant.UINT64)
-  imageMasterKey = messages.StringField(7)
+  imageMainKey = messages.StringField(7)
   kind = messages.StringField(8, default=u'compute#image')
   licenses = messages.StringField(9, repeated=True)
   name = messages.StringField(10)
@@ -4063,7 +4063,7 @@ class Image(messages.Message):
   selfLink = messages.StringField(12)
   sourceDisk = messages.StringField(13)
   sourceDiskId = messages.StringField(14)
-  sourceDiskMasterKey = messages.StringField(15)
+  sourceDiskMainKey = messages.StringField(15)
   sourceType = messages.EnumField('SourceTypeValueValuesEnum', 16, default=u'RAW')
   status = messages.EnumField('StatusValueValuesEnum', 17)
 
@@ -5541,16 +5541,16 @@ class Snapshot(messages.Message):
     name: Name of the resource; provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
     selfLink: Server defined URL for the resource (output only).
-    snapshotMasterKey: Master key to protect the snapshot. When attempting to
-      use a master key protected snapshot, the key must be provided otherwise
-      the request will fail. Master keys do not protect resource metadata.
+    snapshotMainKey: Main key to protect the snapshot. When attempting to
+      use a main key protected snapshot, the key must be provided otherwise
+      the request will fail. Main keys do not protect resource metadata.
       Format: Random 256-bit key material encoded in base64.
     sourceDisk: The source disk used to create this snapshot.
     sourceDiskId: The 'id' value of the disk used to create this snapshot.
       This value may be used to determine whether the snapshot was taken from
       the current or a previous instance of a given disk name.
-    sourceDiskMasterKey: Master key of the source disk; required only if the
-      source disk is master key protected. Format: Random 256-bit key material
+    sourceDiskMainKey: Main key of the source disk; required only if the
+      source disk is main key protected. Format: Random 256-bit key material
       encoded in base64.
     status: The status of the persistent disk snapshot (output only).
     storageBytes: A size of the the storage used by the snapshot. As snapshots
@@ -5596,10 +5596,10 @@ class Snapshot(messages.Message):
   licenses = messages.StringField(6, repeated=True)
   name = messages.StringField(7)
   selfLink = messages.StringField(8)
-  snapshotMasterKey = messages.StringField(9)
+  snapshotMainKey = messages.StringField(9)
   sourceDisk = messages.StringField(10)
   sourceDiskId = messages.StringField(11)
-  sourceDiskMasterKey = messages.StringField(12)
+  sourceDiskMainKey = messages.StringField(12)
   status = messages.EnumField('StatusValueValuesEnum', 13)
   storageBytes = messages.IntegerField(14)
   storageBytesStatus = messages.EnumField('StorageBytesStatusValueValuesEnum', 15)

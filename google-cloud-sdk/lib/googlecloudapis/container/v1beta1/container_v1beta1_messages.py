@@ -18,7 +18,7 @@ class Cluster(messages.Message):
     StatusValueValuesEnum: [Output only] The current status of this cluster.
 
   Fields:
-    clusterApiVersion: The API version of the Kubernetes master and kubelets
+    clusterApiVersion: The API version of the Kubernetes main and kubelets
       running in this cluster. Leave blank to pick up the latest stable
       release, or specify a version of the form "x.y.z". The Google Container
       Engine release notes lists the currently supported versions. If an
@@ -30,11 +30,11 @@ class Cluster(messages.Message):
       RFC3339 text format.
     description: An optional description of this cluster.
     endpoint: [Output only] The IP address of this cluster's Kubernetes
-      master. The endpoint can be accessed from the internet at
-      https://username:password@endpoint/.  See the masterAuth property of
+      main. The endpoint can be accessed from the internet at
+      https://username:password@endpoint/.  See the mainAuth property of
       this resource for username and password information.
-    masterAuth: The HTTP basic authentication information for accessing the
-      master. Because the master endpoint is open to the internet, you should
+    mainAuth: The HTTP basic authentication information for accessing the
+      main. Because the main endpoint is open to the internet, you should
       create a strong password.
     name: The name of this cluster. The name must be unique within this
       project and zone, and can be up to 40 characters with the following
@@ -48,7 +48,7 @@ class Cluster(messages.Message):
       node for hosting containers.
     numNodes: The number of nodes to create in this cluster. You must ensure
       that your Compute Engine resource quota is sufficient for this number of
-      instances plus one (to include the master). You must also have available
+      instances plus one (to include the main). You must also have available
       firewall and routes quota.
     selfLink: [Output only] Server-defined URL for the resource.
     servicesIpv4Cidr: [Output only] The IP addresses of the Kubernetes
@@ -80,7 +80,7 @@ class Cluster(messages.Message):
   creationTimestamp = messages.StringField(3)
   description = messages.StringField(4)
   endpoint = messages.StringField(5)
-  masterAuth = messages.MessageField('MasterAuth', 6)
+  mainAuth = messages.MessageField('MainAuth', 6)
   name = messages.StringField(7)
   network = messages.StringField(8)
   nodeConfig = messages.MessageField('NodeConfig', 9)
@@ -251,13 +251,13 @@ class ListOperationsResponse(messages.Message):
   operations = messages.MessageField('Operation', 1, repeated=True)
 
 
-class MasterAuth(messages.Message):
-  """A MasterAuth object.
+class MainAuth(messages.Message):
+  """A MainAuth object.
 
   Fields:
-    password: The password to use when accessing the Kubernetes master
+    password: The password to use when accessing the Kubernetes main
       endpoint.
-    user: The username to use when accessing the Kubernetes master endpoint.
+    user: The username to use when accessing the Kubernetes main endpoint.
   """
 
   password = messages.StringField(1)

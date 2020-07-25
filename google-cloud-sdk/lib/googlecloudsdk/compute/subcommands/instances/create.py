@@ -8,7 +8,7 @@ from googlecloudsdk.compute.lib import base_classes
 from googlecloudsdk.compute.lib import constants
 from googlecloudsdk.compute.lib import image_utils
 from googlecloudsdk.compute.lib import instance_utils
-from googlecloudsdk.compute.lib import master_key_utils
+from googlecloudsdk.compute.lib import main_key_utils
 from googlecloudsdk.compute.lib import metadata_utils
 from googlecloudsdk.compute.lib import request_helper
 from googlecloudsdk.compute.lib import utils
@@ -41,7 +41,7 @@ class Create(base_classes.BaseAsyncCreator,
     instance_utils.AddNoRestartOnFailureArgs(parser)
     instance_utils.AddScopeArgs(parser)
     instance_utils.AddTagsArgs(parser)
-    master_key_utils.AddMasterKeyArgs(parser)
+    main_key_utils.AddMainKeyArgs(parser)
 
     parser.add_argument(
         '--description',
@@ -171,9 +171,9 @@ class Create(base_classes.BaseAsyncCreator,
       if boot:
         boot_disk_ref = disk_ref
 
-      if self.master_keys:
-        disk_key_or_none = self.master_keys.LookupKey(disk_ref)
-        kwargs = {'diskMasterKey': disk_key_or_none}
+      if self.main_keys:
+        disk_key_or_none = self.main_keys.LookupKey(disk_ref)
+        kwargs = {'diskMainKey': disk_key_or_none}
       else:
         kwargs = {}
 
@@ -207,18 +207,18 @@ class Create(base_classes.BaseAsyncCreator,
       disk_type_ref = None
       disk_type_uri = None
 
-    if self.master_keys:
+    if self.main_keys:
       # If we're going to encrypt the boot disk make sure that we select
       # a name predictably, instead of letting the API deal with name
       # conflicts automatically.
       #
-      # Note that when master keys are being used we *always* want force this
+      # Note that when main keys are being used we *always* want force this
       # even if we don't have any encryption key for default disk name.
       #
       # Consider the case where the user's key file has a key for disk `foo-1`
       # and no other disk.  Assume she runs
-      #   gcloud compute instances create foo --master-key-file f \
-      #       --no-requires-master-key-create
+      #   gcloud compute instances create foo --main-key-file f \
+      #       --no-requires-main-key-create
       # and gcloud doesn't force the disk name to be `foo`.  The API might
       # select name `foo-1` for the new disk, but has no way of knowing
       # that the user has a key file mapping for that disk name.  That
@@ -233,12 +233,12 @@ class Create(base_classes.BaseAsyncCreator,
       disk_ref = self.CreateZonalReference(
           effective_boot_disk_name, instance_ref.zone,
           resource_type='disks')
-      disk_key_or_none = self.master_keys.LookupKey(
-          disk_ref, not args.no_require_master_key_create)
-      [image_key_or_none] = master_key_utils.MaybeLookupKeysByUri(
-          self.master_keys, self.resources, [image_uri])
-      kwargs_init_parms = {'sourceImageMasterKey': image_key_or_none}
-      kwargs_disk = {'diskMasterKey': disk_key_or_none}
+      disk_key_or_none = self.main_keys.LookupKey(
+          disk_ref, not args.no_require_main_key_create)
+      [image_key_or_none] = main_key_utils.MaybeLookupKeysByUri(
+          self.main_keys, self.resources, [image_uri])
+      kwargs_init_parms = {'sourceImageMainKey': image_key_or_none}
+      kwargs_disk = {'diskMainKey': disk_key_or_none}
     else:
       kwargs_disk = {}
       kwargs_init_parms = {}
@@ -342,7 +342,7 @@ class Create(base_classes.BaseAsyncCreator,
     self.ValidateDiskFlags(args)
     instance_utils.ValidateLocalSsdFlags(args)
 
-    self.master_keys = master_key_utils.MasterKeyStore.FromArgs(args)
+    self.main_keys = main_key_utils.MainKeyStore.FromArgs(args)
 
     if args.maintenance_policy:
       on_host_maintenance = (
